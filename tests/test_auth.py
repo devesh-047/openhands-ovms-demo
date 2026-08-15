@@ -57,3 +57,33 @@ def test_unknown_user_login_is_rejected(client):
 
     assert response.status_code == 404
     assert response.json()["detail"] == "User not found"
+
+
+def test_invalid_email_is_rejected(client):
+    response = client.post(
+        "/register",
+        json={"name": "Alice", "email": "john@", "password": "secret"},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Invalid email"
+
+
+def test_email_without_domain_is_rejected(client):
+    response = client.post(
+        "/register",
+        json={"name": "Alice", "email": "john@", "password": "secret"},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Invalid email"
+
+
+def test_email_without_tld_is_rejected(client):
+    response = client.post(
+        "/register",
+        json={"name": "Alice", "email": "john@domain", "password": "secret"},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Invalid email"
